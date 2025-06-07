@@ -1,5 +1,5 @@
 <nav class="admin-navbar">
-        <div class="logo">Sweet Cake Admin</div>
+        <a href="../../index.php" style="text-decoration: none; color:#fff;"><div class="logo">Sweet Cake Admin</div></a>
         <button class="admin-nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.admin-navbar ul').classList.toggle('show')">
             <span></span><span></span><span></span>
         </button>
