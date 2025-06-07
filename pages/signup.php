@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign In - Sweety Cake</title>
+    <title>Sign Up - Sweety Cake</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -14,33 +14,33 @@
             min-height: 100vh;
             font-family: 'Inter', sans-serif;
         }
-        .signin-container {
+        .signup-flex {
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             gap: 0;
         }
-        .signin-visual {
-            flex: 1.2;
+        .signup-visual {
+            flex: 1.1;
             display: flex;
             align-items: center;
             justify-content: center;
             background: linear-gradient(120deg, #ffe3ec 60%, #fff0f6 100%);
             border-radius: 2rem 0 0 2rem;
-            min-height: 420px;
+            min-height: 320px;
             position: relative;
             overflow: hidden;
         }
-        .signin-visual img {
-            max-width: 480px;
+        .signup-visual img {
+            max-width: 320px;
             width: 100%;
             border-radius: 1.5rem;
             box-shadow: 0 8px 40px rgba(231,84,128,0.13);
             object-fit: cover;
             z-index: 2;
         }
-        .signin-visual::before {
+        .signup-visual::before {
             content: '';
             position: absolute;
             top: 10%;
@@ -51,33 +51,33 @@
             border-radius: 2rem;
             z-index: 1;
         }
-        .signin-card {
+        .signup-card {
             flex: 1;
             background: #fff;
             border-radius: 0 2rem 2rem 0;
             box-shadow: 0 8px 40px rgba(0,0,0,0.10);
-            padding: 2.2rem 1.2rem 1.2rem 1.2rem;
+            padding: 1.5rem 1.2rem 1.2rem 1.2rem;
             max-width: 320px;
             min-width: 220px;
             margin: 0;
-            min-height: 350px;
+            min-height: 320px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             position: relative;
         }
-        .signin-card .fa-birthday-cake {
-            font-size: 2.2rem;
+        .signup-card .fa-user-plus {
+            font-size: 2rem;
             margin-bottom: 0.5rem;
         }
-        .signin-title {
+        .signup-title {
             font-family: 'Playfair Display', serif;
             color: var(--primary-pink, #e75480);
             font-weight: 700;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
             text-align: center;
             letter-spacing: 1px;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
         }
         .form-label {
             font-weight: 500;
@@ -111,82 +111,84 @@
             background: #d13c6a;
             box-shadow: 0 4px 24px rgba(231,84,128,0.18);
             color: #fff;
+            
         }
-        .signin-footer {
+        .signup-footer {
             text-align: center;
             margin-top: 1.2rem;
             color: #888;
             font-size: 0.95rem;
         }
-        .signin-footer a {
+        .signup-footer a {
             color: var(--primary-pink, #e75480);
             text-decoration: underline;
             font-weight: 500;
         }
-        .form-check-input:checked {
-            background-color: var(--primary-pink, #e75480);
-            border-color: var(--primary-pink, #e75480);
-        }
         @media (max-width: 900px) {
-            .signin-container {
+            .signup-flex {
                 flex-direction: column;
                 padding: 2rem 0;
             }
-            .signin-visual, .signin-card {
+            .signup-visual, .signup-card {
                 border-radius: 2rem;
                 max-width: 100%;
                 min-width: unset;
             }
-            .signin-visual {
+            .signup-visual {
                 margin-bottom: 2rem;
             }
-            .signin-card {
+            .signup-card {
                 max-width: 340px;
                 min-width: 180px;
-                padding: 1.5rem 0.7rem 1rem 0.7rem;
-            }
-            .signin-visual img {
-                max-width: 320px;
+                padding: 1.2rem 0.7rem 1rem 0.7rem;
             }
         }
         @media (max-width: 600px) {
-            .signin-card {
+            .signup-card {
                 padding: 1.2rem 0.3rem 0.7rem 0.3rem;
                 max-width: 98vw;
             }
-            .signin-visual img {
-                max-width: 180px;
+            .signup-visual img {
+                max-width: 140px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container signin-container">
-        <div class="signin-visual">
-            <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&w=600&q=80" alt="Cake Sign In">
+    <div class="container signup-flex">
+        <div class="signup-visual">
+            <img src="https://images.unsplash.com/photo-1519864600258-abb23847ef2c?auto=format&fit=crop&w=600&q=80" alt="Cake Sign Up">
         </div>
-        <div class="signin-card">
+        <div class="signup-card">
             <div class="text-center mb-3">
-                <i class="fas fa-birthday-cake" style="color: var(--primary-pink, #e75480);"></i>
+                <i class="fas fa-user-plus" style="color: var(--primary-pink, #e75480);"></i>
             </div>
-            <h2 class="signin-title">Sign In to Sweety Cake</h2>
+            <h2 class="signup-title">Create Your Account</h2>
             <form method="post" action="#">
-                <div class="mb-3">
+                <div class="mb-2">
+                    <label for="username" class="form-label">User Name</label>
+                    <input type="text" class="form-control" id="username" name="username" required placeholder="Enter your name">
+                </div>
+                <div class="mb-2">
                     <label for="email" class="form-label">Email address</label>
                     <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
                 </div>
-                <div class="mb-3">
+                <div class="mb-2">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="tel" class="form-control" id="phone" name="phone" required placeholder="Enter your phone number">
+                </div>
+                <div class="mb-2">
                     <label for="password" class="form-label">Password</label>
-                    <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
+                    <input type="password" class="form-control" id="password" name="password" required placeholder="Create a password">
                 </div>
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                    <label class="form-check-label" for="remember">Remember me</label>
+                <div class="mb-2">
+                    <label for="confirm_password" class="form-label">Confirm Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password" required placeholder="Confirm your password">
                 </div>
-                <button type="submit" class="btn btn-theme w-100">Sign In</button>
+                <button type="submit" class="btn btn-theme w-100">Sign Up</button>
             </form>
-            <div class="signin-footer">
-                Don't have an account? <a href="./signup.php">Sign up</a>
+            <div class="signup-footer">
+                Already have an account? <a href="./signin.php">Sign in</a>
             </div>
         </div>
     </div>

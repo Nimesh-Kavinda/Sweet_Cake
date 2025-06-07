@@ -34,7 +34,7 @@
                         <a class="nav-link" href="./pages/contact.php">Contact</a>
                     </li>
                 </ul>
-                <button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button>
+                <a href="./pages/signin.php"><button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button></a>
             </div>
         </div>
     </nav>
