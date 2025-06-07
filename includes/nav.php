@@ -22,9 +22,16 @@
                     </li>
                 </ul>
                 <div class="d-flex align-items-center ms-3 gap-3">
-                    <a href="#" class="nav-link p-0" title="Cart"><i class="fas fa-shopping-cart fa-lg"></i></a>
-                    <a href="#" class="nav-link p-0" title="Wishlist"><i class="fas fa-heart fa-lg"></i></a>
-                    <a href="./signin.php" class="nav-link p-0" title="User"><i class="fas fa-user fa-lg"></i></a>
+                    <a href="./cart.php" class="nav-link p-0" title="Cart"><i class="fas fa-shopping-cart fa-lg"></i></a>
+                    <a href="./wishlist.php" class="nav-link p-0" title="Wishlist"><i class="fas fa-heart fa-lg"></i></a>
+                    <div class="dropdown">
+                        <a href="#" class="nav-link p-0 border-0" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" title="User" style="box-shadow:none;outline:none;border:none;">
+                            <i class="fas fa-user fa-lg"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="#">Logout</a></li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </div>
