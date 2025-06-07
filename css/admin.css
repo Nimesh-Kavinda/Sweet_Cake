@@ -97,8 +97,30 @@ body {
 }
 
 @media (max-width: 900px) {
+    .add-product-form, .add-category-form, .category-list-section, .product-list-section, .orders-section, .users-section, .admin-dashboard-container {
+        max-width: 98vw;
+        padding: 1rem;
+        margin: 1rem auto;
+        border-radius: 8px;
+    }
     .admin-cards {
         flex-direction: column;
-        gap: 1.5rem;
+        gap: 1rem;
+    }
+    .product-table, .category-table, .orders-table, .users-table {
+        font-size: 0.97em;
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+    }
+    .product-table th, .product-table td,
+    .category-table th, .category-table td,
+    .orders-table th, .orders-table td,
+    .users-table th, .users-table td {
+        padding: 0.6rem 0.5rem;
+        white-space: nowrap;
+    }
+    .admin-dashboard-title {
+        font-size: 1.3rem;
     }
 }
