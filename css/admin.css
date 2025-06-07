@@ -1,0 +1,104 @@
+/* admin.css - Styles for the Admin Dashboard */
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #f7f7fa;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-navbar {
+    background: #2d2d44;
+    color: #fff;
+    padding: 0 0 0 0;
+    display: flex;
+    align-items: center;
+    height: 60px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.admin-navbar .logo {
+    font-size: 1.5rem;
+    font-weight: bold;
+    padding: 0 2rem;
+    letter-spacing: 2px;
+}
+
+.admin-navbar ul {
+    list-style: none;
+    display: flex;
+    margin: 0;
+    padding: 0;
+}
+
+.admin-navbar ul li {
+    margin: 0 1rem;
+}
+
+.admin-navbar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.admin-navbar ul li a:hover, .admin-navbar ul li a.active {
+    background: #44446a;
+}
+
+.admin-dashboard-container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+
+.admin-dashboard-title {
+    font-size: 2rem;
+    color: #2d2d44;
+    margin-bottom: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.admin-cards {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+}
+
+.admin-card {
+    flex: 1 1 220px;
+    background: #f0f1fa;
+    border-radius: 8px;
+    padding: 2rem 1.5rem;
+    box-shadow: 0 2px 8px rgba(44,44,100,0.07);
+    text-align: center;
+    transition: box-shadow 0.2s;
+}
+
+.admin-card:hover {
+    box-shadow: 0 6px 24px rgba(44,44,100,0.13);
+}
+
+.admin-card h3 {
+    margin: 0 0 0.5rem 0;
+    color: #2d2d44;
+    font-size: 1.2rem;
+}
+
+.admin-card p {
+    color: #44446a;
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+@media (max-width: 900px) {
+    .admin-cards {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
