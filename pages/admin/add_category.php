@@ -107,7 +107,7 @@
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody id="categoryTableBody">
+            <tbody>
                 <tr><td colspan="3" style="text-align:center; color:#888;">No categories added yet.</td></tr>
             </tbody>
         </table>
