@@ -86,31 +86,27 @@
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <!-- Quantity Selector -->
+                        </div>                        <!-- Quantity Selector -->
                         <div class="quantity-selector mb-4">
                             <h6 style="color: var(--dark-chocolate); margin-bottom: 1rem;">Quantity</h6>
                             <div class="d-flex align-items-center">
-                                <button class="btn-quantity" onclick="decreaseQuantity()" style="background: var(--secondary-pink); border: none; width: 40px; height: 40px; border-radius: 50%; color: var(--dark-chocolate); font-weight: bold;">-</button>
-                                <span id="quantity" style="margin: 0 1.5rem; font-size: 1.2rem; font-weight: 600; min-width: 30px; text-align: center;">1</span>
-                                <button class="btn-quantity" onclick="increaseQuantity()" style="background: var(--secondary-pink); border: none; width: 40px; height: 40px; border-radius: 50%; color: var(--dark-chocolate); font-weight: bold;">+</button>
+                                <button class="btn-quantity" style="background: var(--secondary-pink); border: none; width: 40px; height: 40px; border-radius: 50%; color: var(--dark-chocolate); font-weight: bold;">-</button>
+                                <span style="margin: 0 1.5rem; font-size: 1.2rem; font-weight: 600; min-width: 30px; text-align: center;">1</span>
+                                <button class="btn-quantity" style="background: var(--secondary-pink); border: none; width: 40px; height: 40px; border-radius: 50%; color: var(--dark-chocolate); font-weight: bold;">+</button>
                             </div>
-                        </div>
-
-                        <!-- Action Buttons -->
+                        </div>                        <!-- Action Buttons -->
                         <div class="product-actions">
                             <div class="row g-3">
                                 <div class="col-12 col-md-8">
-                                    <button class="btn-add-to-cart w-100" onclick="addToCart()" 
+                                    <button class="btn-add-to-cart w-100" 
                                             style="background: var(--gradient-main); color: white; border: none; padding: 1rem 2rem; border-radius: 50px; font-weight: 600; font-size: 1.1rem; transition: all 0.3s ease; box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);">
                                         <i class="fas fa-shopping-cart me-2"></i>Add to Cart
                                     </button>
                                 </div>
                                 <div class="col-12 col-md-4">
-                                    <button class="btn-wishlist w-100" onclick="toggleWishlist()" 
+                                    <button class="btn-wishlist w-100" 
                                             style="background: white; color: var(--primary-pink); border: 2px solid var(--primary-pink); padding: 1rem; border-radius: 50px; font-weight: 600; transition: all 0.3s ease;">
-                                        <i id="wishlistIcon" class="far fa-heart me-2"></i><span id="wishlistText">Wishlist</span>
+                                        <i class="far fa-heart me-2"></i><span>Wishlist</span>
                                     </button>
                                 </div>
                             </div>
@@ -173,126 +169,7 @@
     </section>
 
     <!-- Footer -->
-    <?php include '../includes/footer.php'; ?>
-
+    <?php include '../includes/footer.php'; ?>    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-      <script>
-        // Quantity functionality
-        let currentQuantity = 1;
-
-        function increaseQuantity() {
-            currentQuantity++;
-            document.getElementById('quantity').textContent = currentQuantity;
-        }
-
-        function decreaseQuantity() {
-            if (currentQuantity > 1) {
-                currentQuantity--;
-                document.getElementById('quantity').textContent = currentQuantity;
-            }
-        }
-
-        // Add to cart functionality
-        function addToCart() {
-            // Here you would typically send data to server
-            const button = document.querySelector('.btn-add-to-cart');
-            const originalText = button.innerHTML;
-            
-            button.innerHTML = '<i class="fas fa-check me-2"></i>Added to Cart!';
-            button.style.background = 'var(--accent-gold)';
-            button.style.color = 'var(--dark-chocolate)';
-            
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.style.background = 'var(--gradient-main)';
-                button.style.color = 'white';
-            }, 2000);
-            
-            // Show notification
-            showNotification('Product added to cart successfully!', 'success');
-        }
-
-        // Wishlist functionality
-        let isInWishlist = false;
-
-        function toggleWishlist() {
-            const icon = document.getElementById('wishlistIcon');
-            const text = document.getElementById('wishlistText');
-            const button = document.querySelector('.btn-wishlist');
-            
-            if (isInWishlist) {
-                icon.className = 'far fa-heart me-2';
-                text.textContent = 'Wishlist';
-                button.style.background = 'white';
-                button.style.color = 'var(--primary-pink)';
-                showNotification('Removed from wishlist', 'info');
-            } else {
-                icon.className = 'fas fa-heart me-2';
-                text.textContent = 'In Wishlist';
-                button.style.background = 'var(--primary-pink)';
-                button.style.color = 'white';
-                showNotification('Added to wishlist!', 'success');
-            }
-            
-            isInWishlist = !isInWishlist;
-        }
-
-        // Notification system
-        function showNotification(message, type = 'success') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.style.cssText = `
-                position: fixed;
-                top: 100px;
-                right: 20px;
-                background: ${type === 'success' ? 'var(--accent-gold)' : 'var(--primary-pink)'};
-                color: var(--dark-chocolate);
-                padding: 1rem 1.5rem;
-                border-radius: 10px;
-                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-                z-index: 1000;
-                font-weight: 600;
-                animation: slideIn 0.3s ease;
-            `;
-            notification.textContent = message;
-            
-            document.body.appendChild(notification);
-            
-            // Remove notification after 3 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        notification.parentNode.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
-        }
-
-        // Add animation keyframes
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
-            }
-            
-            .btn-add-to-cart:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 12px 30px rgba(255, 107, 157, 0.6);
-            }
-            
-            .btn-wishlist:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 20px rgba(255, 107, 157, 0.3);
-            }
-        `;
-        document.head.appendChild(style);
-    </script>
 </body>
 </html>
