@@ -184,14 +184,34 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./pages/contact.php">Contact</a>
-                    </li>                </ul>                <?php
+                    </li>                
+                    </ul>                
+                    
+                    <?php 
+
+                    if(isset ($_SESSION['user_id'])) {
+                        echo '     <div class="d-flex align-items-center ms-3 gap-3">
+                    <a href="./pages/cart.php" class="nav-link p-0" title="Cart"><i class="fas fa-shopping-cart fa-lg"></i></a>
+                    <a href="./pages/wishlist.php" class="nav-link p-0" title="Wishlist"><i class="fas fa-heart fa-lg"></i></a>
+                    </div>';
+                    }
+                ?>
+
+
+                    <?php
                 if(!isset($_SESSION['user_id'])) {
                     // Show Sign Up and Sign In buttons for guests
                     echo '<a href="./pages/signin.php"><button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button></a>';
                 } else {
                     // Show user info and logout button for logged-in users
-                    echo '<span class="navbar-text me-3" style="color: var(--primary-pink);">Welcome, ' . htmlspecialchars($_SESSION['user_name']) . '</span>';
-                    echo '<button class="btn btn-primary ms-3" id="logoutBtn" type="button" onclick="showLogoutConfirmation()">Logout</button>';
+                    if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
+                        echo '<a href="./pages/admin/dashboard.php"><button class="btn btn-outline-success ms-3" id="adminDashboardBtn" type="button">Dashboard</button></a>';
+                    } 
+                    else{
+                        echo '<button class="btn btn-outline-danger ms-3" id="logoutBtn" type="button" onclick="showLogoutConfirmation()">Logout</button>';
+                    }
+                    
+                    echo '<span class="navbar-text ms-3" style="color: var(--primary-pink);">Welcome, ' . htmlspecialchars($_SESSION['user_name']) . '!</span>';
                 }
                 ?>
             </div>
