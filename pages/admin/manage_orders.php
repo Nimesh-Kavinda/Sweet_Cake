@@ -378,7 +378,7 @@ function getStatusBadgeClass($status) {
                             <th>Order Details</th>
                             <th>Total</th>
                             <th>Status</th>
-                            <th>Badge</th>
+                            <th>#</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
