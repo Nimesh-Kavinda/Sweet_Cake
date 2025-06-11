@@ -8,15 +8,18 @@ if (!isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'admin') {
     exit;
 }
 
-// Handle message actions (mark as read, delete)
+// Handle message actions (mark as read, delete, delete all)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['action']) && isset($_POST['message_id'])) {
-        $message_id = intval($_POST['message_id']);
-        
-        if ($_POST['action'] === 'delete') {
+    if (isset($_POST['action'])) {
+        if ($_POST['action'] === 'delete' && isset($_POST['message_id'])) {
+            $message_id = intval($_POST['message_id']);
             $stmt = $conn->prepare("DELETE FROM message WHERE id = ?");
             $stmt->execute([$message_id]);
             $_SESSION['success_message'] = "Message deleted successfully.";
+        } elseif ($_POST['action'] === 'delete_all') {
+            $stmt = $conn->prepare("DELETE FROM message");
+            $stmt->execute();
+            $_SESSION['success_message'] = "All messages deleted successfully.";
         }
     }
     header('Location: manage_messages.php');
@@ -194,11 +197,15 @@ $totalPages = ceil($totalMessages / $limit);
                 form.submit();
             }
         }
-        
-        function deleteAllMessages() {
+          function deleteAllMessages() {
             if (confirm('Are you sure you want to delete ALL messages? This action cannot be undone.')) {
-                // You can implement this functionality if needed
-                alert('This feature can be implemented as needed');
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.innerHTML = `
+                    <input type="hidden" name="action" value="delete_all">
+                `;
+                document.body.appendChild(form);
+                form.submit();
             }
         }
         
