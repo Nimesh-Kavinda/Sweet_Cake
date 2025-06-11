@@ -3,12 +3,12 @@
         <button class="admin-nav-toggle" aria-label="Toggle navigation" onclick="document.querySelector('.admin-navbar ul').classList.toggle('show')">
             <span></span><span></span><span></span>
         </button>
-        <ul>
-            <li><a href="./dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">Dashboard</a></li>
+        <ul>            <li><a href="./dashboard.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">Dashboard</a></li>
             <li><a href="./add_product.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'add_product.php' ? 'active' : ''; ?>">Add Products</a></li>
             <li><a href="./add_category.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'add_category.php' ? 'active' : ''; ?>">Add Categories</a></li>
             <li><a href="./manage_orders.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_orders.php' ? 'active' : ''; ?>">Manage Orders</a></li>
             <li><a href="./manage_users.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_users.php' ? 'active' : ''; ?>">Manage Users</a></li>
+            <li><a href="./manage_messages.php" class="<?php echo basename($_SERVER['PHP_SELF']) == 'manage_messages.php' ? 'active' : ''; ?>">Messages</a></li>
             <li style="margin-left:auto;"><a href="../../function/logout.php" style="background:#e74c3c; color:#fff; border-radius:4px; padding:0.5rem 1.2rem;">Logout</a></li>
         </ul>
         <style>
