@@ -1,3 +1,73 @@
+<?php
+session_start();
+require_once '../config/db.php';
+
+$message = '';
+$messageType = '';
+
+// Check if user is already logged in
+if (isset($_SESSION['user_id'])) {
+    header('Location: ../index.php');
+    exit();
+}
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    
+    // Validation
+    $errors = [];
+    
+    if (empty($email)) {
+        $errors[] = 'Email is required';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Please enter a valid email address';
+    }
+    
+    if (empty($password)) {
+        $errors[] = 'Password is required';
+    }
+    
+    // If no validation errors, attempt login
+    if (empty($errors)) {
+        try {
+            $stmt = $conn->prepare("SELECT id, name, email, password, role, created_at FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            
+            if ($stmt->rowCount() == 1) {
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+                  // Verify password
+                if (password_verify($password, $user['password'])) {
+                    // Set session variables
+                    $_SESSION['user_id'] = $user['id'];
+                    $_SESSION['user_name'] = $user['name'];
+                    $_SESSION['user_email'] = $user['email'];
+                    $_SESSION['user_role'] = $user['role'];
+                    $_SESSION['user_created_at'] = $user['created_at'];
+                    
+                    $message = 'Welcome back, ' . htmlspecialchars($user['name']) . '! Redirecting...';
+                    $messageType = 'success';
+                    
+                    // Set redirect flag for JavaScript
+                    $redirect = true;
+                } else {
+                    $errors[] = 'Invalid email or password';
+                }
+            } else {
+                $errors[] = 'Invalid email or password';
+            }
+        } catch (PDOException $e) {
+            $errors[] = 'Database error occurred. Please try again.';
+        }
+    }
+      // Set error message if there are errors
+    if (!empty($errors)) {
+        $message = implode('<br>', $errors);
+        $messageType = 'error';
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +77,52 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">
-    <style>
+    <link rel="stylesheet" href="../css/main.css">    <style>
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+        
+        .notification .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         body {
             background: linear-gradient(135deg, #fff0f6 0%, #ffe3ec 100%);
             min-height: 100vh;
@@ -117,15 +231,10 @@
             margin-top: 1.2rem;
             color: #888;
             font-size: 0.95rem;
-        }
-        .signin-footer a {
+        }        .signin-footer a {
             color: var(--primary-pink, #e75480);
             text-decoration: underline;
             font-weight: 500;
-        }
-        .form-check-input:checked {
-            background-color: var(--primary-pink, #e75480);
-            border-color: var(--primary-pink, #e75480);
         }
         @media (max-width: 900px) {
             .signin-container {
@@ -168,27 +277,64 @@
         <div class="signin-card">
             <div class="text-center mb-3">
                 <i class="fas fa-birthday-cake" style="color: var(--primary-pink, #e75480);"></i>
-            </div>
-            <h2 class="signin-title">Sign In to Sweety Cake</h2>
-            <form method="post" action="#">
+            </div>            <h2 class="signin-title">Sign In to Sweety Cake</h2>
+            <form method="post" action="">
                 <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
-                    <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
-                </div>
-                <div class="mb-3">
+                    <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>">
+                </div>                <div class="mb-3">
                     <label for="password" class="form-label">Password</label>
                     <input type="password" class="form-control" id="password" name="password" required placeholder="Enter your password">
-                </div>
-                <div class="mb-3 form-check">
-                    <input type="checkbox" class="form-check-input" id="remember" name="remember">
-                    <label class="form-check-label" for="remember">Remember me</label>
                 </div>
                 <button type="submit" class="btn btn-theme w-100">Sign In</button>
             </form>
             <div class="signin-footer">
                 Don't have an account? <a href="./signup.php">Sign up</a>
-            </div>
-        </div>
+            </div>        </div>
     </div>
+
+    <!-- Notification -->
+    <?php if (!empty($message)): ?>
+    <div class="notification <?php echo $messageType; ?>" id="notification">
+        <button class="close-btn" onclick="closeNotification()">&times;</button>
+        <?php echo $message; ?>
+    </div>
+    <?php endif; ?>
+
+    <script>
+        // Show notification
+        <?php if (!empty($message)): ?>
+        window.addEventListener('DOMContentLoaded', function() {
+            const notification = document.getElementById('notification');
+            if (notification) {
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    closeNotification();
+                }, 5000);
+            }
+        });
+        <?php endif; ?>
+
+        function closeNotification() {
+            const notification = document.getElementById('notification');
+            if (notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }
+
+        // Redirect to index page after successful login
+        <?php if (isset($redirect) && $redirect): ?>
+        setTimeout(() => {
+            window.location.href = '../index.php';
+        }, 2000);
+        <?php endif; ?>
+    </script>
 </body>
 </html>
