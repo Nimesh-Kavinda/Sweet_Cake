@@ -43,9 +43,6 @@
                             echo '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--primary-pink); font-size: 0.7rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">' . $cartCount . '</span>';
                         }
                         
-                        echo '</a>
-                    <a href="./wishlist.php" class="nav-link p-0" title="Wishlist"><i class="fas fa-heart fa-lg"></i></a>
-                    </div>';
                     }
                 ?>
 
