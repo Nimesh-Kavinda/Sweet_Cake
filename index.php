@@ -279,62 +279,37 @@
         </div>
     </section>
 
-    <!-- Gallery Section -->
-    <section id="gallery" class="gallery-section">
-        <div class="container">
-            <h2 class="section-title">Our Sweet Creations</h2>
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="gallery-item">
-                        <div>
-                            <i class="fas fa-birthday-cake" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Birthday Cakes</div>
+    <!-- Testimonials Section -->
+  <section id="testimonials" class="testimonial-section py-5 bg-light">
+    <div class="container">
+        <h2 class="section-title text-center mb-5">What Our Customers Say</h2>
+        <div class="row">
+            <!-- Testimonial 1 -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body p-4">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
                         </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="gallery-item">
-                        <div>
-                            <i class="fas fa-heart" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Wedding Cakes</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="gallery-item">
-                        <div>
-                            <i class="fas fa-cookie-bite" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Cupcakes</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="gallery-item">
-                        <div>
-                            <i class="fas fa-ice-cream" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Ice Cream Cakes</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="gallery-item">
-                        <div>
-                            <i class="fas fa-gift" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Special Occasions</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="gallery-item">
-                        <div>
-                            <i class="fas fa-star" style="font-size: 3rem; margin-bottom: 1rem;"></i>
-                            <div>Signature Cakes</div>
+                        <p class="card-text mb-4">"The birthday cake was absolutely delicious! The design was exactly what I wanted and it tasted even better than it looked. Will definitely order again!"</p>
+                        <div class="d-flex align-items-center">
+                            
+                            <div>
+                                <h6 class="mb-0">Sarah Johnson</h6>
+                                <small class="text-muted">Happy Customer</small>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+       
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Contact Section -->
     <section id="contact" class="contact-section">
