@@ -13,9 +13,9 @@ try {
 
 // Get filter parameters
 $selectedCategory = isset($_GET['category']) ? $_GET['category'] : 'all';
-$searchTerm = isset($_GET['search']) ? trim($_GET['search']) : '';
+$searchTerm = ''; // Always empty - search is now client-side only
 
-// Build the query based on filters
+// Build the query based on category filter only
 $sql = "SELECT p.*, c.category_name FROM products p 
         LEFT JOIN category c ON p.category_id = c.id 
         WHERE 1=1";
@@ -26,10 +26,8 @@ if ($selectedCategory !== 'all') {
     $params[] = $selectedCategory;
 }
 
-if (!empty($searchTerm)) {
-    $sql .= " AND p.name LIKE ?";
-    $params[] = "%{$searchTerm}%";
-}
+// Remove search functionality from server-side
+// Search is now handled entirely on the client-side
 
 $sql .= " ORDER BY p.created_at DESC";
 
@@ -120,14 +118,186 @@ try {
             border-left: 3px solid #e74c3c;
             border-radius: 0 5px 5px 0;
         }
-        
-        .no-products {
+          .no-products {
             background: #fff;
             border-radius: 2rem;
             padding: 3rem 2rem;
             text-align: center;
             margin: 2rem 0;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+        
+        /* Beautiful Custom Alerts */
+        .sweet-alert {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            max-width: 400px;
+            min-width: 320px;
+            padding: 20px 25px;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            transform: translateX(500px);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            opacity: 0;
+            border: 2px solid transparent;
+        }
+        
+        .sweet-alert.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        
+        .sweet-alert.success {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-color: #27ae60;
+            color: #155724;
+        }
+        
+        .sweet-alert.update {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-color: #f39c12;
+            color: #856404;
+        }
+        
+        .sweet-alert.error {
+            background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+            border-color: #e74c3c;
+            color: #721c24;
+        }
+        
+        .sweet-alert.warning {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .alert-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-size: 14px;
+        }
+        
+        .success .alert-icon {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .update .alert-icon {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .error .alert-icon {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .warning .alert-icon {
+            background: #ffc107;
+            color: #856404;
+        }
+        
+        .alert-message {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+        
+        .alert-details {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 15px;
+        }
+        
+        .alert-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+            color: inherit;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .alert-close:hover {
+            opacity: 1;
+        }
+        
+        .alert-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .alert-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        
+        .btn-view-cart {
+            background: var(--primary-pink);
+            color: white;
+        }
+          .btn-view-cart:hover {
+            background: #d13c6a;
+            transform: translateY(-1px);
+        }
+        
+        /* Mobile Responsive Alerts */
+        @media (max-width: 480px) {
+            .sweet-alert {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+                min-width: auto;
+                transform: translateY(-200px);
+            }
+            
+            .sweet-alert.show {
+                transform: translateY(0);
+            }
+            
+            .alert-header {
+                font-size: 1rem;
+            }
+            
+            .alert-message {
+                font-size: 0.9rem;
+            }
+            
+            .alert-details {
+                font-size: 0.8rem;
+            }
         }
         
         @media (max-width: 768px) {
@@ -178,10 +348,9 @@ try {
                         </option>
                     <?php endforeach; ?>
                 </select>
-            </div>
-            <div class="d-flex align-items-center gap-2">
+            </div>            <div class="d-flex align-items-center gap-2">
                 <label for="searchInput" class="me-2 mb-0"><i class="fas fa-search"></i> Search:</label>
-                <input type="text" id="searchInput" class="form-control" placeholder="Search cakes..." style="border-radius: 50px; border: 1px solid var(--secondary-pink); min-width: 180px;" value="<?php echo htmlspecialchars($searchTerm); ?>" onkeyup="filterProducts()">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search cakes..." style="border-radius: 50px; border: 1px solid var(--secondary-pink); min-width: 180px;" value="<?php echo htmlspecialchars($searchTerm); ?>">
             </div>
         </div>
     </div>    <!-- Product Gallery -->
@@ -236,13 +405,11 @@ try {
 
     <!-- Footer -->
   <?php include '../includes/footer.php'; ?>    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Filter products function
+    <script>        // Filter products function - ONLY for category changes (page reload)
         function filterProducts() {
             const category = document.getElementById('categoryFilter').value;
-            const search = document.getElementById('searchInput').value;
             
-            // Update URL with current filters
+            // Update URL with current category filter only
             const url = new URL(window.location);
             if (category === 'all') {
                 url.searchParams.delete('category');
@@ -250,23 +417,90 @@ try {
                 url.searchParams.set('category', category);
             }
             
-            if (search.trim() === '') {
-                url.searchParams.delete('search');
-            } else {
-                url.searchParams.set('search', search);
+            // Remove search from URL when changing category
+            url.searchParams.delete('search');
+            
+            // Reload page with new category
+            window.location.href = url.toString();
+        }        // Client-side search function - NO page reload
+        function filterProductsClientSide() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const productCards = document.querySelectorAll('.product-item');
+            let visibleCount = 0;
+            
+            productCards.forEach(card => {
+                const productName = card.getAttribute('data-name');
+                const shouldShow = searchTerm === '' || productName.includes(searchTerm);
+                
+                if (shouldShow) {
+                    card.style.display = 'block';
+                    card.style.opacity = '1';
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            
+            // Handle no results case
+            const existingNoResults = document.querySelector('.search-no-results');
+            if (existingNoResults) {
+                existingNoResults.remove();
             }
             
-            // Reload page with new parameters
-            window.location.href = url.toString();
-        }
-
-        // Real-time search with debounce
+            if (visibleCount === 0 && searchTerm.length > 0) {
+                // Show "no results" message
+                const gallery = document.getElementById('productGallery');
+                const noResultsDiv = document.createElement('div');
+                noResultsDiv.className = 'col-12 search-no-results';
+                noResultsDiv.innerHTML = `
+                    <div class="no-products">
+                        <i class="fas fa-search" style="font-size: 4rem; color: var(--primary-pink, #e75480); margin-bottom: 1rem;"></i>
+                        <h3 style="color: var(--dark-chocolate, #2c2c2c); margin-bottom: 1rem;">No products found</h3>
+                        <p style="color: #888; font-size: 1.1rem;">No products match your search "<strong>${searchTerm}</strong>".</p>
+                        <button class="btn" style="background: var(--primary-pink, #e75480); color: white; border: none; border-radius: 25px; padding: 0.75rem 2rem; margin-top: 1rem;" onclick="clearSearch()">
+                            <i class="fas fa-times me-2"></i>Clear Search
+                        </button>
+                    </div>
+                `;
+                gallery.appendChild(noResultsDiv);
+            }
+            
+            // Update search input styling
+            const searchInput = document.getElementById('searchInput');
+            if (searchTerm.length > 0) {
+                searchInput.style.borderColor = 'var(--primary-pink)';
+                searchInput.style.backgroundColor = '#fff8fa';
+            } else {
+                searchInput.style.borderColor = 'var(--secondary-pink)';
+                searchInput.style.backgroundColor = '#f7f7fa';
+            }
+        }        // Clear search function
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            
+            // Remove no results message
+            const noResults = document.querySelector('.search-no-results');
+            if (noResults) {
+                noResults.remove();
+            }
+            
+            // Show all products
+            document.querySelectorAll('.product-item').forEach(card => {
+                card.style.display = 'block';
+                card.style.opacity = '1';
+            });
+            
+            // Reset search input styling
+            const searchInput = document.getElementById('searchInput');
+            searchInput.style.borderColor = 'var(--secondary-pink)';
+            searchInput.style.backgroundColor = '#f7f7fa';
+        }// Real-time search with debounce - CLIENT SIDE ONLY
         let searchTimeout;
         document.getElementById('searchInput').addEventListener('input', function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
-                filterProducts();
-            }, 1000); // Wait 1 second after user stops typing
+                filterProductsClientSide();
+            }, 300); // Faster response, no page reload
         });
 
         // View product details
@@ -286,41 +520,125 @@ try {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        showNotification('Product added to cart successfully!', 'success');
+                        if (data.is_update) {
+                            // Product quantity was updated (same product added again)
+                            showSweetAlert('update', 'Product Updated!', data.message, {
+                                product: data.product_name,
+                                quantity: data.quantity,
+                                cartCount: data.cart_count
+                            });
+                        } else {
+                            // New product added to cart
+                            showSweetAlert('success', 'Added to Cart!', data.message, {
+                                product: data.product_name,
+                                quantity: data.quantity,
+                                cartCount: data.cart_count
+                            });
+                        }
                     } else {
-                        showNotification(data.message || 'Failed to add product to cart', 'error');
+                        showSweetAlert('error', 'Failed to Add!', data.message);
                     }
                 })
                 .catch(error => {
-                    showNotification('An error occurred. Please try again.', 'error');
+                    showSweetAlert('error', 'Error Occurred!', 'An error occurred. Please try again.');
                 });
             <?php else: ?>
                 // User not logged in, redirect to signin
-                showNotification('Please sign in to add products to cart', 'warning');
-                setTimeout(() => {
-                    window.location.href = 'signin.php';
-                }, 2000);
+                showSweetAlert('warning', 'Sign In Required!', 'Please sign in to add products to cart', {}, () => {
+                    setTimeout(() => {
+                        window.location.href = 'signin.php';
+                    }, 2000);
+                });
             <?php endif; ?>
-        }
-
-        // Simple notification function
-        function showNotification(message, type) {
-            const notification = document.createElement('div');
-            notification.className = `alert alert-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'warning'} position-fixed`;
-            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; max-width: 300px;';
-            notification.innerHTML = `
-                ${message}
-                <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
+        }        // Beautiful Sweet Alert System
+        function showSweetAlert(type, title, message, details = {}, callback = null) {
+            // Remove any existing alerts
+            const existingAlert = document.querySelector('.sweet-alert');
+            if (existingAlert) {
+                existingAlert.remove();
+            }
+            
+            // Create alert element
+            const alert = document.createElement('div');
+            alert.className = `sweet-alert ${type}`;
+            
+            // Get appropriate icon
+            let icon = '';
+            switch(type) {
+                case 'success':
+                    icon = '<i class="fas fa-check"></i>';
+                    break;
+                case 'update':
+                    icon = '<i class="fas fa-sync-alt"></i>';
+                    break;
+                case 'error':
+                    icon = '<i class="fas fa-times"></i>';
+                    break;
+                case 'warning':
+                    icon = '<i class="fas fa-exclamation"></i>';
+                    break;
+            }
+            
+            // Build alert content
+            let alertContent = `
+                <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                <div class="alert-header">
+                    <div class="alert-icon">${icon}</div>
+                    ${title}
+                </div>
+                <div class="alert-message">${message}</div>
             `;
             
-            document.body.appendChild(notification);
+            // Add details if provided
+            if (details.product) {
+                alertContent += `
+                    <div class="alert-details">
+                        <strong>${details.product}</strong><br>
+                        Quantity: ${details.quantity} | Cart Total: ${details.cartCount} items
+                    </div>
+                `;
+            }
             
-            // Auto remove after 5 seconds
+            // Add action buttons for cart operations
+            if (type === 'success' || type === 'update') {
+                alertContent += `
+                    <div class="alert-actions">
+                        <button class="alert-btn btn-view-cart" onclick="window.location.href='cart.php'">
+                            <i class="fas fa-shopping-cart me-1"></i>View Cart
+                        </button>
+                    </div>
+                `;
+            }
+            
+            alert.innerHTML = alertContent;
+            document.body.appendChild(alert);
+            
+            // Trigger animation
             setTimeout(() => {
-                if (notification.parentElement) {
-                    notification.remove();
+                alert.classList.add('show');
+            }, 100);
+            
+            // Auto remove after 6 seconds
+            setTimeout(() => {
+                if (alert.parentElement) {
+                    alert.classList.remove('show');
+                    setTimeout(() => {
+                        if (alert.parentElement) {
+                            alert.remove();
+                        }
+                    }, 400);
                 }
-            }, 5000);
+            }, 6000);
+            
+            // Execute callback if provided
+            if (callback) {
+                callback();
+            }
+        }
+
+        // Legacy notification function for backward compatibility
+        function showNotification(message, type) {
+            showSweetAlert(type, type === 'success' ? 'Success!' : type === 'error' ? 'Error!' : 'Notice!', message);
         }
 
         // Add animation on scroll
