@@ -155,9 +155,94 @@
             cursor: pointer;
             transition: background 0.2s ease;
         }
-        
-        .btn-cancel:hover {
+          .btn-cancel:hover {
             background: #5a6268;
+        }
+        
+        /* Categories Section Styles */
+        .categories-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .category-card {
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255,255,255,0.1);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .category-card:hover::before {
+            opacity: 1;
+        }
+        
+        .category-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+        
+        .category-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .category-icon {
+            font-size: 3rem;
+            color: rgba(255,255,255,0.9);
+            margin-bottom: 1rem;
+        }
+        
+        .category-title {
+            color: white;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .category-description {
+            color: rgba(255,255,255,0.9);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .btn-category {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-category:hover {
+            background: rgba(255,255,255,0.3);
+            color: white;
+            border-color: rgba(255,255,255,0.5);
+            transform: translateY(-2px);
+            text-decoration: none;
         }
     </style>
 </head>
@@ -245,7 +330,7 @@
                 <div class="col-lg-6 hero-content">
                     <h1 class="hero-title">Sweet Dreams Come True</h1>
                     <p class="hero-subtitle">Crafting extraordinary cakes that make every celebration unforgettable. From custom designs to classic favorites, we bring sweetness to life.</p>
-                    <a href="#gallery" class="btn-custom">
+                    <a href="./pages/gallery.php" class="btn-custom">
                         <i class="fas fa-heart me-2"></i>Explore Our Cakes
                     </a>
                 </div>
@@ -292,39 +377,128 @@
                 </div>
             </div>
         </div>
-    </section>
-
-    <!-- Testimonials Section -->
-  <section id="testimonials" class="testimonial-section py-5 bg-light">
-    <div class="container">
-        <h2 class="section-title text-center mb-5">What Our Customers Say</h2>
-        <div class="row">
-            <!-- Testimonial 1 -->
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-body p-4">
-                        <div class="mb-3 text-warning">
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                            <i class="fas fa-star"></i>
-                        </div>
-                        <p class="card-text mb-4">"The birthday cake was absolutely delicious! The design was exactly what I wanted and it tasted even better than it looked. Will definitely order again!"</p>
-                        <div class="d-flex align-items-center">
-                            
-                            <div>
-                                <h6 class="mb-0">Sarah Johnson</h6>
-                                <small class="text-muted">Happy Customer</small>
+    </section>    <!-- Categories Section -->
+    <section id="categories" class="categories-section py-5 bg-light">
+        <div class="container">
+            <h2 class="section-title text-center mb-5">Browse Our Categories</h2>
+            <div class="row g-4">
+                <?php
+                // Fetch categories from database
+                try {
+                    $categoryStmt = $conn->prepare("SELECT id, category_name FROM category ORDER BY category_name");
+                    $categoryStmt->execute();
+                    $categories = $categoryStmt->fetchAll(PDO::FETCH_ASSOC);
+                      // Define colors and icons for categories
+                    $colors = [
+                        '#FF6B9D', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', 
+                        '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+                    ];
+                    
+                    // Define icons for different category types
+                    $categoryIcons = [
+                        'birthday' => 'fa-birthday-cake',
+                        'wedding' => 'fa-heart',
+                        'chocolate' => 'fa-cookie-bite',
+                        'fruit' => 'fa-apple-alt',
+                        'cupcake' => 'fa-cubes',
+                        'cheese' => 'fa-cheese',
+                        'anniversary' => 'fa-gift',
+                        'custom' => 'fa-magic',
+                        'default' => 'fa-birthday-cake'
+                    ];
+                    
+                    function getCategoryIcon($categoryName, $iconMap) {
+                        $name = strtolower($categoryName);
+                        foreach ($iconMap as $key => $icon) {
+                            if (strpos($name, $key) !== false) {
+                                return $icon;
+                            }
+                        }
+                        return $iconMap['default'];
+                    }
+                    
+                    $colorIndex = 0;
+                    
+                    if (!empty($categories)): 
+                        foreach ($categories as $category):
+                            $bgColor = $colors[$colorIndex % count($colors)];
+                            $icon = getCategoryIcon($category['category_name'], $categoryIcons);
+                            $colorIndex++;
+                ?>
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="category-card" style="background: linear-gradient(135deg, <?php echo $bgColor; ?>, <?php echo $bgColor; ?>CC);">
+                            <div class="category-content">
+                                <div class="category-icon">
+                                    <i class="fas <?php echo $icon; ?>"></i>
+                                </div>
+                                <h4 class="category-title"><?php echo htmlspecialchars($category['category_name']); ?></h4>
+                                <p class="category-description">Explore our delicious collection</p>
+                                <a href="./pages/gallery.php?category=<?php echo $category['id']; ?>" class="btn-category">
+                                    View Products <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
                             </div>
                         </div>
                     </div>
-                </div>
+                <?php 
+                        endforeach;
+                    else:                        // Default categories if database is empty
+                        $defaultCategories = [
+                            ['name' => 'Birthday Cakes', 'color' => '#FF6B9D', 'icon' => 'fa-birthday-cake'],
+                            ['name' => 'Wedding Cakes', 'color' => '#4ECDC4', 'icon' => 'fa-heart'],
+                            ['name' => 'Chocolate Cakes', 'color' => '#45B7D1', 'icon' => 'fa-cookie-bite'],
+                            ['name' => 'Fruit Cakes', 'color' => '#96CEB4', 'icon' => 'fa-apple-alt'],
+                        ];
+                        
+                        foreach ($defaultCategories as $category):
+                ?>
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="category-card" style="background: linear-gradient(135deg, <?php echo $category['color']; ?>, <?php echo $category['color']; ?>CC);">
+                            <div class="category-content">
+                                <div class="category-icon">
+                                    <i class="fas <?php echo $category['icon']; ?>"></i>
+                                </div>
+                                <h4 class="category-title"><?php echo $category['name']; ?></h4>
+                                <p class="category-description">Explore our delicious collection</p>
+                                <a href="./pages/gallery.php" class="btn-category">
+                                    View Products <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div><?php 
+                        endforeach;
+                    endif;
+                } catch (PDOException $e) {
+                    // Default categories if database error
+                    $defaultCategories = [
+                        ['name' => 'Birthday Cakes', 'color' => '#FF6B9D'],
+                        ['name' => 'Wedding Cakes', 'color' => '#4ECDC4'],
+                        ['name' => 'Chocolate Cakes', 'color' => '#45B7D1'],
+                        ['name' => 'Fruit Cakes', 'color' => '#96CEB4'],
+                    ];
+                    
+                    foreach ($defaultCategories as $category):
+                ?>
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <div class="category-card" style="background: linear-gradient(135deg, <?php echo $category['color']; ?>, <?php echo $category['color']; ?>CC);">
+                            <div class="category-content">
+                                <div class="category-icon">
+                                    <i class="fas fa-birthday-cake"></i>
+                                </div>
+                                <h4 class="category-title"><?php echo $category['name']; ?></h4>
+                                <p class="category-description">Explore our delicious collection</p>
+                                <a href="./pages/gallery.php" class="btn-category">
+                                    View Products <i class="fas fa-arrow-right ms-2"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                <?php 
+                    endforeach;
+                }
+                ?>
             </div>
-       
         </div>
-    </div>
-</section>
+    </section>
 
     <!-- Contact Section -->
     <section id="contact" class="contact-section">
@@ -510,9 +684,7 @@
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver(function(entries) {
+        };        const observer = new IntersectionObserver(function(entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = '1';
@@ -521,8 +693,8 @@
             });
         }, observerOptions);
 
-        // Observe all feature cards and gallery items
-        document.querySelectorAll('.feature-card, .gallery-item').forEach(el => {
+        // Observe all feature cards, category cards and gallery items
+        document.querySelectorAll('.feature-card, .category-card, .gallery-item').forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(30px)';
             el.style.transition = 'all 0.6s ease';

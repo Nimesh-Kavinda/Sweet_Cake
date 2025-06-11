@@ -353,7 +353,32 @@ try {
                 <input type="text" id="searchInput" class="form-control" placeholder="Search cakes..." style="border-radius: 50px; border: 1px solid var(--secondary-pink); min-width: 180px;" value="<?php echo htmlspecialchars($searchTerm); ?>">
             </div>
         </div>
-    </div>    <!-- Product Gallery -->
+    </div>    <!-- Category Breadcrumb (if coming from category) -->
+    <?php if (isset($_GET['category']) && $_GET['category'] !== 'all'): 
+        $categoryName = '';
+        foreach ($categories as $cat) {
+            if ($cat['id'] == $_GET['category']) {
+                $categoryName = $cat['category_name'];
+                break;
+            }
+        }
+        if ($categoryName):
+    ?>
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb" style="background: rgba(255,255,255,0.8); backdrop-filter: blur(10px); border-radius: 15px; padding: 1rem 1.5rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+                <li class="breadcrumb-item">
+                    <a href="../index.php#categories" style="color: var(--primary-pink); text-decoration: none;">
+                        <i class="fas fa-home me-2"></i>Categories
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page" style="color: var(--dark-chocolate);">
+                    <i class="fas fa-birthday-cake me-2"></i><?php echo htmlspecialchars($categoryName); ?>
+                </li>
+            </ol>
+        </nav>
+    </div>
+    <?php endif; endif; ?>    <!-- Product Gallery -->
     <div class="container">
         <div class="row g-4" id="productGallery">            <?php if (empty($products)): ?>
                 <div class="col-12">
