@@ -78,13 +78,19 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             
             // Commit transaction
             $conn->commit();
+              // Store order details in session for confirmation page
+            $_SESSION['order_confirmation'] = [
+                'order_id' => $orderId,
+                'total_amount' => $totalAmount,
+                'order_date' => date('Y-m-d H:i:s'),
+                'phone' => $phone,
+                'address' => $address,
+                'payment_method' => $paymentMethod
+            ];
             
-            // Redirect to success page or show success message
-            $message = 'Order placed successfully! Order ID: #' . $orderId;
-            $messageType = 'success';
-            
-            // Redirect after 2 seconds
-            header("refresh:2;url=gallery.php");
+            // Redirect to confirmation page
+            header("Location: confirm.php");
+            exit();
             
         } catch (Exception $e) {
             // Rollback transaction
