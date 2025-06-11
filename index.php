@@ -269,51 +269,67 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./pages/contact.php">Contact</a>
-                    </li>                
-                    </ul>                
-                      <?php 
-
-                    if(isset ($_SESSION['user_id'])) {
-                        // Get cart count for logged-in user
-                        $cartCount = 0;
-                        try {
-                            $cartCountStmt = $conn->prepare("SELECT SUM(quantity) as total_items FROM cart WHERE user_id = ?");
-                            $cartCountStmt->execute([$_SESSION['user_id']]);
-                            $cartResult = $cartCountStmt->fetch(PDO::FETCH_ASSOC);
-                            $cartCount = $cartResult['total_items'] ?? 0;
-                        } catch (PDOException $e) {
-                            $cartCount = 0;
-                        }
-
-                        echo '     <div class="d-flex align-items-center ms-3 gap-3">
-                    <a href="./pages/cart.php" class="nav-link p-0 position-relative" title="Cart">
-                        <i class="fas fa-shopping-cart fa-lg"></i>';
-                        
-                        if ($cartCount > 0) {
-                            echo '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--primary-pink); font-size: 0.7rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">' . $cartCount . '</span>';
-                        }
-                        
-                   
-                    }
-                ?>
-
-
-                    <?php
-                if(!isset($_SESSION['user_id'])) {
-                    // Show Sign Up and Sign In buttons for guests
-                    echo '<a href="./pages/signin.php"><button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button></a>';
-                } else {
-                    // Show user info and logout button for logged-in users
-                    if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin') {
-                        echo '<a href="./pages/admin/dashboard.php"><button class="btn btn-outline-success ms-3" id="adminDashboardBtn" type="button">Dashboard</button></a>';
-                    } 
-                    else{
-                        echo '<button class="btn btn-outline-danger ms-3" id="logoutBtn" type="button" onclick="showLogoutConfirmation()">Logout</button>';
-                    }
+                    </li>                    </ul>                
                     
-                    echo '<span class="navbar-text ms-3" style="color: var(--primary-pink);">Welcome, ' . htmlspecialchars($_SESSION['user_name']) . '!</span>';
-                }
-                ?>
+                    <?php if(isset($_SESSION['user_id'])): ?>
+                        <!-- Logged-in user navigation -->
+                        <div class="d-flex align-items-center ms-3 gap-3">
+                            <!-- Cart Icon -->
+                            <?php
+                            // Get cart count for logged-in user
+                            $cartCount = 0;
+                            try {
+                                $cartCountStmt = $conn->prepare("SELECT SUM(quantity) as total_items FROM cart WHERE user_id = ?");
+                                $cartCountStmt->execute([$_SESSION['user_id']]);
+                                $cartResult = $cartCountStmt->fetch(PDO::FETCH_ASSOC);
+                                $cartCount = $cartResult['total_items'] ?? 0;
+                            } catch (PDOException $e) {
+                                $cartCount = 0;
+                            }
+                            ?>
+                            
+                            <a href="./pages/cart.php" class="nav-link p-0 position-relative" title="Cart">
+                                <i class="fas fa-shopping-cart fa-lg"></i>
+                                <?php if ($cartCount > 0): ?>
+                                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--primary-pink); font-size: 0.7rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">
+                                        <?php echo $cartCount; ?>
+                                    </span>
+                                <?php endif; ?>
+                            </a>
+                            
+                            <!-- User Dropdown Menu -->
+                            <div class="dropdown">
+                                <a href="#" class="nav-link p-0" data-bs-toggle="dropdown" aria-expanded="false" title="Account" style="text-decoration: none;">
+                                    <i class="fas fa-user fa-lg"></i>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="./pages/orders.php"><i class="fas fa-box me-2"></i>My Orders</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li><a class="dropdown-item text-danger" href="#" onclick="showLogoutConfirmation()"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                                </ul>
+                            </div>
+                            
+                            <!-- Admin Dashboard Button (if admin) -->
+                            <?php if(isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                                <a href="./pages/admin/dashboard.php">
+                                    <button class="btn btn-outline-success ms-2" type="button">Dashboard</button>
+                                </a>
+                            <?php endif; ?>
+                            
+                            <!-- Welcome Message -->
+                            <span class="navbar-text ms-3" style="color: var(--primary-pink);">
+                                Welcome, <?php echo htmlspecialchars($_SESSION['user_name']); ?>!
+                            </span>
+                        </div>
+                        
+                    <?php else: ?>
+                        <!-- Guest user navigation -->
+                        <a href="./pages/signin.php">
+                            <button class="btn btn-outline-primary ms-3" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">
+                                Sign In
+                            </button>
+                        </a>
+                    <?php endif; ?>
             </div>
         </div>
     </nav>
