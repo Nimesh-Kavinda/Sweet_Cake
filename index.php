@@ -1,3 +1,9 @@
+<?php
+ session_start();
+ include 'config/db.php';
+?> 
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,9 +38,17 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./pages/contact.php">Contact</a>
-                    </li>
-                </ul>
-                <a href="./pages/signin.php"><button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button></a>
+                    </li>                </ul>
+                <?php
+                if(!isset($_SESSION['user_id'])) {
+                    // Show Sign Up and Sign In buttons for guests
+                    echo '<a href="./pages/signin.php"><button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button></a>';
+                } else {
+                    // Show user info and logout button for logged-in users
+                    echo '<span class="navbar-text me-3" style="color: var(--primary-pink);">Welcome, ' . htmlspecialchars($_SESSION['user_name']) . '</span>';
+                    echo '<a href="./function/logout.php"><button class="btn btn-primary ms-3" id="logoutBtn" type="button">Logout</button></a>';
+                }
+                ?>
             </div>
         </div>
     </nav>

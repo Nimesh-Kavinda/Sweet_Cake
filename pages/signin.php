@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                     $_SESSION['user_role'] = $user['role'];
                     $_SESSION['user_created_at'] = $user['created_at'];
                     
-                    $message = 'Welcome back, ' . htmlspecialchars($user['name']) . '! Redirecting...';
+                    $message = 'Welcome back, ' . htmlspecialchars($user['name']) . '!';
                     $messageType = 'success';
                     
                     // Set redirect flag for JavaScript
