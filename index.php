@@ -12,8 +12,154 @@
     <title>Sweety Cake - Premium Cake Shop</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/main.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">    <link rel="stylesheet" href="css/main.css">
+    <style>
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+        
+        .notification.warning {
+            background: linear-gradient(135deg, #ffc107, #ff8f00);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+        }
+        
+        .notification .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Confirmation Modal Styles */
+        .confirmation-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .confirmation-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .confirmation-content {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+        
+        .confirmation-modal.show .confirmation-content {
+            transform: scale(1);
+        }
+        
+        .confirmation-icon {
+            font-size: 3rem;
+            color: var(--primary-pink, #e75480);
+            margin-bottom: 20px;
+        }
+        
+        .confirmation-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .confirmation-message {
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .btn-confirm {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .btn-confirm:hover {
+            background: #c82333;
+        }
+        
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -38,15 +184,14 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="./pages/contact.php">Contact</a>
-                    </li>                </ul>
-                <?php
+                    </li>                </ul>                <?php
                 if(!isset($_SESSION['user_id'])) {
                     // Show Sign Up and Sign In buttons for guests
                     echo '<a href="./pages/signin.php"><button class="btn btn-outline-primary ms-3" id="signInBtn" type="button" style="border-color: var(--primary-pink); color: var(--primary-pink);">Sign In</button></a>';
                 } else {
                     // Show user info and logout button for logged-in users
                     echo '<span class="navbar-text me-3" style="color: var(--primary-pink);">Welcome, ' . htmlspecialchars($_SESSION['user_name']) . '</span>';
-                    echo '<a href="./function/logout.php"><button class="btn btn-primary ms-3" id="logoutBtn" type="button">Logout</button></a>';
+                    echo '<button class="btn btn-primary ms-3" id="logoutBtn" type="button" onclick="showLogoutConfirmation()">Logout</button>';
                 }
                 ?>
             </div>
@@ -240,11 +385,91 @@
                     <p>&copy; 2025 Sweety Cake. All rights reserved. Made with <i class="fas fa-heart" style="color: var(--primary-pink);"></i> and lots of sugar!</p>
                 </div>
             </div>
-        </div>
-    </footer>
+        </div>    </footer>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <!-- Logout Confirmation Modal -->
+    <div class="confirmation-modal" id="logoutModal">
+        <div class="confirmation-content">
+            <div class="confirmation-icon">
+                <i class="fas fa-sign-out-alt"></i>
+            </div>
+            <h3 class="confirmation-title">Confirm Logout</h3>
+            <p class="confirmation-message">Are you sure you want to logout? You will need to sign in again to access your account.</p>
+            <div class="confirmation-buttons">
+                <button class="btn-confirm" onclick="confirmLogout()">Yes, Logout</button>
+                <button class="btn-cancel" onclick="cancelLogout()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>    <script>
+        // Logout confirmation functions
+        function showLogoutConfirmation() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.add('show');
+        }
+
+        function confirmLogout() {
+            // Show logout notification
+            showNotification('Logging out...', 'info');
+            
+            // Redirect to logout after a brief delay
+            setTimeout(() => {
+                window.location.href = './function/logout.php';
+            }, 1000);
+        }
+
+        function cancelLogout() {
+            const modal = document.getElementById('logoutModal');
+            modal.classList.remove('show');
+            showNotification('Logout cancelled', 'warning');
+        }
+
+        // Notification function
+        function showNotification(message, type = 'info') {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <button class="close-btn" onclick="closeNotification(this.parentElement)">&times;</button>
+                ${message}
+            `;
+            
+            container.appendChild(notification);
+            
+            // Show notification
+            setTimeout(() => {
+                notification.classList.add('show');
+            }, 100);
+            
+            // Auto hide after 4 seconds
+            setTimeout(() => {
+                closeNotification(notification);
+            }, 4000);
+        }
+
+        function closeNotification(notification) {
+            if (notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.parentElement.removeChild(notification);
+                    }
+                }, 300);
+            }
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('logoutModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                cancelLogout();
+            }
+        });
+
         // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
