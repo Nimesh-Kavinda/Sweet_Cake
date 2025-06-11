@@ -1,6 +1,7 @@
 <?php
 // Start session and include database connection
 session_start();
+require_once '../config/db.php';
 
 // Redirect to login if user is not logged in
 if (!isset($_SESSION['user_id'])) {
@@ -11,17 +12,8 @@ if (!isset($_SESSION['user_id'])) {
 $current_user_id = $_SESSION['user_id'];
 $current_user_name = $_SESSION['user_name'] ?? 'User';
 
-// Database configuration - using existing connection pattern
-require_once '../config/db.php';
-
-// Initialize PDO connection (using existing db connection)
-try {
-    if (!isset($pdo)) {
-        $pdo = $conn; // Use existing connection from db.php
-    }
-} catch(PDOException $e) {
-    $pdo = null;
-}
+// Use the existing database connection
+$pdo = $conn;
 
 // Handle AJAX requests for order actions
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -102,6 +94,11 @@ $order_stats = ['total' => 0, 'pending' => 0, 'processing' => 0, 'shipped' => 0,
 
 if ($pdo) {
     try {
+        // Debug: Check if user exists and has orders
+        $debugStmt = $pdo->prepare("SELECT COUNT(*) as order_count FROM orders WHERE user_id = ?");
+        $debugStmt->execute([$current_user_id]);
+        $debugResult = $debugStmt->fetch(PDO::FETCH_ASSOC);
+        
         // Get orders with order items
         $stmt = $pdo->prepare("
             SELECT o.*, 
@@ -128,6 +125,8 @@ if ($pdo) {
         }
         
     } catch (PDOException $e) {
+        // Add error handling for debugging
+        error_log("Database error in orders.php: " . $e->getMessage());
         $orders = [];
     }
 }
@@ -442,15 +441,40 @@ if ($pdo) {
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Orders Table -->
+            </div>            <!-- Orders Table -->
             <?php if (empty($orders)): ?>
                 <div class="orders-table p-4">
                     <div class="empty-orders">
                         <i class="fas fa-shopping-bag"></i>
                         <h3>No Orders Yet</h3>
                         <p>You haven't placed any orders yet. Start shopping for delicious cakes!</p>
+                        
+                        <!-- Debug Information (remove in production) -->
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0; font-size: 0.9rem; color: #666;">
+                            <strong>Debug Info:</strong><br>
+                            User ID: <?php echo $current_user_id; ?><br>
+                            Database Connection: <?php echo $pdo ? 'Connected' : 'Not Connected'; ?><br>
+                            <?php if (isset($debugResult)): ?>
+                                Orders in DB for this user: <?php echo $debugResult['order_count']; ?><br>
+                            <?php endif; ?>
+                            <?php 
+                            // Check if orders table exists
+                            try {
+                                $tableCheck = $pdo->query("SHOW TABLES LIKE 'orders'");
+                                $tableExists = $tableCheck->rowCount() > 0;
+                                echo "Orders table exists: " . ($tableExists ? 'Yes' : 'No') . "<br>";
+                                
+                                if ($tableExists) {
+                                    $allOrdersStmt = $pdo->query("SELECT COUNT(*) as total FROM orders");
+                                    $allOrders = $allOrdersStmt->fetch(PDO::FETCH_ASSOC);
+                                    echo "Total orders in database: " . $allOrders['total'] . "<br>";
+                                }
+                            } catch (Exception $e) {
+                                echo "Table check error: " . $e->getMessage() . "<br>";
+                            }
+                            ?>
+                        </div>
+                        
                         <a href="../pages/gallery.php" class="btn" style="background: var(--primary-pink); color: white; border-radius: 25px; padding: 0.7rem 2rem; text-decoration: none; font-weight: 600;">
                             <i class="fas fa-shopping-cart me-2"></i>Start Shopping
                         </a>
