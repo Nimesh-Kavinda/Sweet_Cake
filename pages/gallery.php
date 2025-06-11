@@ -517,9 +517,11 @@ try {
                     },
                     body: `product_id=${productId}&quantity=1`
                 })
-                .then(response => response.json())
-                .then(data => {
+                .then(response => response.json())                .then(data => {
                     if (data.success) {
+                        // Update cart count in navigation
+                        updateNavCartCount(data.cart_count);
+                        
                         if (data.is_update) {
                             // Product quantity was updated (same product added again)
                             showSweetAlert('update', 'Product Updated!', data.message, {
@@ -634,11 +636,34 @@ try {
             if (callback) {
                 callback();
             }
-        }
-
-        // Legacy notification function for backward compatibility
+        }        // Legacy notification function for backward compatibility
         function showNotification(message, type) {
             showSweetAlert(type, type === 'success' ? 'Success!' : type === 'error' ? 'Error!' : 'Notice!', message);
+        }
+
+        // Update cart count in navigation
+        function updateNavCartCount(count) {
+            const cartLink = document.querySelector('a[href="./cart.php"]');
+            if (cartLink) {
+                const badge = cartLink.querySelector('.badge');
+                if (count > 0) {
+                    if (badge) {
+                        badge.textContent = count;
+                    } else {
+                        // Create badge if it doesn't exist
+                        const newBadge = document.createElement('span');
+                        newBadge.className = 'position-absolute top-0 start-100 translate-middle badge rounded-pill';
+                        newBadge.style.cssText = 'background-color: var(--primary-pink); font-size: 0.7rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;';
+                        newBadge.textContent = count;
+                        cartLink.appendChild(newBadge);
+                    }
+                } else {
+                    // Remove badge if count is 0
+                    if (badge) {
+                        badge.remove();
+                    }
+                }
+            }
         }
 
         // Add animation on scroll

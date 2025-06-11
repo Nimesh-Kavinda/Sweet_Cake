@@ -1,6 +1,52 @@
 <?php
 session_start();
 include '../config/db.php';
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header('Location: signin.php');
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Fetch cart items for the user
+try {
+    $cartStmt = $conn->prepare("
+        SELECT 
+            c.cart_id,
+            c.quantity,
+            p.id as product_id,
+            p.name,
+            p.price,
+            p.image,
+            (c.quantity * p.price) as item_total
+        FROM cart c 
+        JOIN products p ON c.product_id = p.id 
+        WHERE c.user_id = ?
+        ORDER BY c.added_at DESC
+    ");
+    $cartStmt->execute([$user_id]);
+    $cartItems = $cartStmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    // If cart is empty, redirect to cart page
+    if (empty($cartItems)) {
+        header('Location: cart.php');
+        exit();
+    }
+    
+    // Calculate totals
+    $subtotal = 0;
+    foreach ($cartItems as $item) {
+        $subtotal += $item['item_total'];
+    }
+    $deliveryFee = 3.00;
+    $total = $subtotal + $deliveryFee;
+    
+} catch (PDOException $e) {
+    header('Location: cart.php');
+    exit();
+}
 ?>
 
 

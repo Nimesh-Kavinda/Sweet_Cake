@@ -21,12 +21,29 @@
                         <a class="nav-link" href="./contact.php">Contact</a>
                     </li>                
                     </ul>                
-                    
-                    <?php 
+                      <?php 
 
                     if(isset ($_SESSION['user_id'])) {
+                        // Get cart count for logged-in user
+                        $cartCount = 0;
+                        try {
+                            $cartCountStmt = $conn->prepare("SELECT SUM(quantity) as total_items FROM cart WHERE user_id = ?");
+                            $cartCountStmt->execute([$_SESSION['user_id']]);
+                            $cartResult = $cartCountStmt->fetch(PDO::FETCH_ASSOC);
+                            $cartCount = $cartResult['total_items'] ?? 0;
+                        } catch (PDOException $e) {
+                            $cartCount = 0;
+                        }
+
                         echo '     <div class="d-flex align-items-center ms-3 gap-3">
-                    <a href="./cart.php" class="nav-link p-0" title="Cart"><i class="fas fa-shopping-cart fa-lg"></i></a>
+                    <a href="./cart.php" class="nav-link p-0 position-relative" title="Cart">
+                        <i class="fas fa-shopping-cart fa-lg"></i>';
+                        
+                        if ($cartCount > 0) {
+                            echo '<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill" style="background-color: var(--primary-pink); font-size: 0.7rem; min-width: 18px; height: 18px; display: flex; align-items: center; justify-content: center;">' . $cartCount . '</span>';
+                        }
+                        
+                        echo '</a>
                     <a href="./wishlist.php" class="nav-link p-0" title="Wishlist"><i class="fas fa-heart fa-lg"></i></a>
                     </div>';
                     }
