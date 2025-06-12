@@ -1,3 +1,85 @@
+<?php
+session_start();
+require_once '../config/db.php';
+
+$message = '';
+$messageType = '';
+
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = $_POST['password'];
+    $confirm_password = $_POST['confirm_password'];
+    
+    // Validation
+    $errors = [];
+    
+    if (empty($username)) {
+        $errors[] = 'Username is required';
+    } elseif (strlen($username) < 2) {
+        $errors[] = 'Username must be at least 2 characters long';
+    }
+    
+    if (empty($email)) {
+        $errors[] = 'Email is required';
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $errors[] = 'Please enter a valid email address';
+    }
+    
+    if (empty($password)) {
+        $errors[] = 'Password is required';
+    } elseif (strlen($password) < 6) {
+        $errors[] = 'Password must be at least 6 characters long';
+    }
+    
+    if ($password !== $confirm_password) {
+        $errors[] = 'Passwords do not match';
+    }
+    
+    // Check if email already exists
+    if (empty($errors)) {
+        try {
+            $stmt = $conn->prepare("SELECT id FROM users WHERE email = ?");
+            $stmt->execute([$email]);
+            
+            if ($stmt->rowCount() > 0) {
+                $errors[] = 'Email address is already registered';
+            }
+        } catch (PDOException $e) {
+            $errors[] = 'Database error occurred';
+        }
+    }
+    
+    // If no errors, create user
+    if (empty($errors)) {
+        try {
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            
+            $stmt = $conn->prepare("INSERT INTO users (name, email, password, created_at, role) VALUES (?, ?, ?, NOW(), 'user')");
+            $result = $stmt->execute([$username, $email, $hashed_password]);
+            
+            if ($result) {
+                $message = 'Account created successfully! You can now sign in.';
+                $messageType = 'success';
+                
+                // Clear form data
+                $username = $email = '';
+            } else {
+                $errors[] = 'Failed to create account. Please try again.';
+            }
+        } catch (PDOException $e) {
+            $errors[] = 'Database error: Unable to create account';
+        }
+    }
+    
+    // Set error message if there are errors
+    if (!empty($errors)) {
+        $message = implode('<br>', $errors);
+        $messageType = 'error';
+    }
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +89,52 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/main.css">
-    <style>
+    <link rel="stylesheet" href="../css/main.css">    <style>
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            transform: translateX(400px);
+            transition: all 0.3s ease;
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545, #e74c3c);
+        }
+        
+        .notification .close-btn {
+            position: absolute;
+            top: 5px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         body {
             background: linear-gradient(135deg, #fff0f6 0%, #ffe3ec 100%);
             min-height: 100vh;
@@ -162,9 +288,8 @@
         <div class="signup-card">
             <div class="text-center mb-3">
                 <i class="fas fa-user-plus" style="color: var(--primary-pink, #e75480);"></i>
-            </div>
-            <h2 class="signup-title">Create Your Account</h2>
-            <form method="post" action="#">
+            </div>            <h2 class="signup-title">Create Your Account</h2>
+            <form method="post" action="">
                 <div class="mb-2">
                     <label for="username" class="form-label">User Name</label>
                     <input type="text" class="form-control" id="username" name="username" required placeholder="Enter your name">
@@ -172,10 +297,6 @@
                 <div class="mb-2">
                     <label for="email" class="form-label">Email address</label>
                     <input type="email" class="form-control" id="email" name="email" required placeholder="Enter your email">
-                </div>
-                <div class="mb-2">
-                    <label for="phone" class="form-label">Phone</label>
-                    <input type="tel" class="form-control" id="phone" name="phone" required placeholder="Enter your phone number">
                 </div>
                 <div class="mb-2">
                     <label for="password" class="form-label">Password</label>
@@ -189,8 +310,51 @@
             </form>
             <div class="signup-footer">
                 Already have an account? <a href="./signin.php">Sign in</a>
-            </div>
-        </div>
+            </div>        </div>
     </div>
+
+    <!-- Notification -->
+    <?php if (!empty($message)): ?>
+    <div class="notification <?php echo $messageType; ?>" id="notification">
+        <button class="close-btn" onclick="closeNotification()">&times;</button>
+        <?php echo $message; ?>
+    </div>
+    <?php endif; ?>
+
+    <script>
+        // Show notification
+        <?php if (!empty($message)): ?>
+        window.addEventListener('DOMContentLoaded', function() {
+            const notification = document.getElementById('notification');
+            if (notification) {
+                setTimeout(() => {
+                    notification.classList.add('show');
+                }, 100);
+                
+                // Auto hide after 5 seconds
+                setTimeout(() => {
+                    closeNotification();
+                }, 5000);
+            }
+        });
+        <?php endif; ?>
+
+        function closeNotification() {
+            const notification = document.getElementById('notification');
+            if (notification) {
+                notification.classList.remove('show');
+                setTimeout(() => {
+                    notification.remove();
+                }, 300);
+            }
+        }
+
+        // Redirect to signin page after successful registration
+        <?php if ($messageType === 'success'): ?>
+        setTimeout(() => {
+            window.location.href = './signin.php';
+        }, 3000);
+        <?php endif; ?>
+    </script>
 </body>
 </html>
