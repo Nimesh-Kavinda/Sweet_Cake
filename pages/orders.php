@@ -1,7 +1,7 @@
 <?php
 // Start session and include database connection
 session_start();
-require_once '../config/db.php';
+include '../config/db.php';
 
 // Redirect to login if user is not logged in
 if (!isset($_SESSION['user_id'])) {
@@ -35,9 +35,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (!in_array($new_status, $allowed_statuses)) {
                 throw new Exception('Invalid status');
             }
-            
-            // Check if order belongs to current user and can be updated
-            $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = ? AND user_id = ?");
+              // Check if order belongs to current user and can be updated
+            $stmt = $pdo->prepare("SELECT status FROM orders WHERE order_id = ? AND user_id = ?");
             $stmt->execute([$order_id, $current_user_id]);
             $order = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -52,14 +51,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 }
             }
             
-            $stmt = $pdo->prepare("UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ? AND user_id = ?");
+            $stmt = $pdo->prepare("UPDATE orders SET status = ? WHERE order_id = ? AND user_id = ?");
             $stmt->execute([$new_status, $order_id, $current_user_id]);
             
             echo json_encode(['success' => true, 'message' => 'Order status updated successfully']);
-            
-        } elseif ($action === 'delete_order') {
+              } elseif ($action === 'delete_order') {
             // Check if order belongs to current user and can be deleted
-            $stmt = $pdo->prepare("SELECT status FROM orders WHERE id = ? AND user_id = ?");
+            $stmt = $pdo->prepare("SELECT status FROM orders WHERE order_id = ? AND user_id = ?");
             $stmt->execute([$order_id, $current_user_id]);
             $order = $stmt->fetch(PDO::FETCH_ASSOC);
             
@@ -76,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt = $pdo->prepare("DELETE FROM order_items WHERE order_id = ?");
             $stmt->execute([$order_id]);
             
-            $stmt = $pdo->prepare("DELETE FROM orders WHERE id = ? AND user_id = ?");
+            $stmt = $pdo->prepare("DELETE FROM orders WHERE order_id = ? AND user_id = ?");
             $stmt->execute([$order_id, $current_user_id]);
             
             echo json_encode(['success' => true, 'message' => 'Order deleted successfully']);
@@ -93,24 +91,28 @@ $orders = [];
 $order_stats = ['total' => 0, 'pending' => 0, 'processing' => 0, 'shipped' => 0, 'delivered' => 0, 'cancelled' => 0, 'completed' => 0];
 
 if ($pdo) {
-    try {
-        // Debug: Check if user exists and has orders
+    try {        // Debug: Check if user exists and has orders
         $debugStmt = $pdo->prepare("SELECT COUNT(*) as order_count FROM orders WHERE user_id = ?");
         $debugStmt->execute([$current_user_id]);
         $debugResult = $debugStmt->fetch(PDO::FETCH_ASSOC);
-        
-        // Get orders with order items
+          // Get orders with order items - Updated to show product names instead of IDs
         $stmt = $pdo->prepare("
-            SELECT o.*, 
+            SELECT o.order_id as id, o.user_id, o.order_date as created_at, o.total_amount, 
+                   o.status, o.payment_method, o.phone, o.shipping_address as delivery_address,
                    GROUP_CONCAT(
-                       CONCAT(oi.product_name, ' x', oi.quantity, ' (₹', oi.price, ')')
+                       CONCAT(
+                           COALESCE(p.name, CONCAT('Product ID: ', oi.product_id)), 
+                           ' x', oi.quantity, 
+                           ' (₹', oi.price, ')'
+                       )
                        SEPARATOR '|'
                    ) as order_items
             FROM orders o 
-            LEFT JOIN order_items oi ON o.id = oi.order_id 
+            LEFT JOIN order_items oi ON o.order_id = oi.order_id 
+            LEFT JOIN products p ON oi.product_id = p.id
             WHERE o.user_id = ? 
-            GROUP BY o.id 
-            ORDER BY o.created_at DESC
+            GROUP BY o.order_id 
+            ORDER BY o.order_date DESC
         ");
         $stmt->execute([$current_user_id]);
         $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
